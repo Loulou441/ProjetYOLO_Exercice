@@ -28,11 +28,7 @@ CLASS_COLORS = [
     "#F4A261", "#264653", "#8338EC", "#FB5607",
 ]
 
-
-# ══════════════════════════════════════════════════════════════════════════════
 # 1. load_model
-# ══════════════════════════════════════════════════════════════════════════════
-
 def load_model() -> YOLO:
     """
     Télécharge best.pt depuis Hugging Face et retourne un objet YOLO
@@ -66,10 +62,7 @@ def load_model() -> YOLO:
     print(f"[load_model] Modèle chargé depuis : {model_path}")
     return YOLO(model_path)
 
-
-# ══════════════════════════════════════════════════════════════════════════════
 # 2. diagnose_thresholds
-# ══════════════════════════════════════════════════════════════════════════════
 
 def diagnose_thresholds(model: YOLO, image_path: str) -> tuple:
     """
@@ -129,9 +122,7 @@ def diagnose_thresholds(model: YOLO, image_path: str) -> tuple:
     return chosen_results, chosen_conf
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # 3. visualize
-# ══════════════════════════════════════════════════════════════════════════════
 
 def visualize(results, img_pil: Image.Image, conf: float, save_path: Path) -> None:
     """
@@ -231,9 +222,7 @@ def visualize(results, img_pil: Image.Image, conf: float, save_path: Path) -> No
     print(f"[visualize] Figure sauvegardée : {save_path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # 4. report_and_export
-# ══════════════════════════════════════════════════════════════════════════════
 
 def report_and_export(results, conf: float, save_path: Path) -> None:
     """
@@ -297,9 +286,7 @@ def report_and_export(results, conf: float, save_path: Path) -> None:
     print(f"[report_and_export] JSON sauvegardé : {save_path}")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
 # main
-# ══════════════════════════════════════════════════════════════════════════════
 
 # Variable globale pour la palette de noms (remplie après chargement du modèle)
 model_names: dict[int, str] = {}
