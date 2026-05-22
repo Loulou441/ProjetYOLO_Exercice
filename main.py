@@ -20,25 +20,10 @@ from PIL import Image
 from ultralytics import YOLO
 
 # ── Configuration ──────────────────────────────────────────────────────────────
-from config import HF_MODEL_ID, HF_TOKEN, IMAGE_PATH, OUTPUT_DIR, CONF_FINAL
-
-# Palette de couleurs par classe (extensible)
-CLASS_COLORS = [
-    "#E63946", "#457B9D", "#2A9D8F", "#E9C46A",
-    "#F4A261", "#264653", "#8338EC", "#FB5607",
-]
+from config import HF_MODEL_ID, HF_TOKEN, IMAGE_PATH, OUTPUT_DIR, CONF_FINAL, CLASS_COLORS
 
 # 1. load_model
 def load_model() -> YOLO:
-    """
-    Télécharge best.pt depuis Hugging Face et retourne un objet YOLO
-    prêt à l'inférence.
-
-    Résolution du token (ordre de priorité) :
-      1. Constante HF_TOKEN dans config.py
-      2. Variable d'environnement HF_TOKEN
-      3. Cache huggingface-cli login
-    """
     token = HF_TOKEN or os.environ.get("HF_TOKEN") or None
 
     print(f"[load_model] Téléchargement de best.pt depuis {HF_MODEL_ID} …")
@@ -65,14 +50,6 @@ def load_model() -> YOLO:
 # 2. diagnose_thresholds
 
 def diagnose_thresholds(model: YOLO, image_path: str) -> tuple:
-    """
-    Teste la détection à plusieurs seuils décroissants.
-    Retourne (results, conf_retenu) au premier seuil ≤ CONF_FINAL
-    ayant produit au moins une détection.
-
-    Seuils testés : 0.50 → 0.25 → 0.10 → 0.05 → 0.01
-    Paramètres d'inférence : iou=0.45, imgsz=1280, verbose=False
-    """
     thresholds = [0.50, 0.25, 0.10, 0.05, 0.01]
 
     print("\n[diagnose_thresholds] Tableau de diagnostic")
@@ -125,16 +102,6 @@ def diagnose_thresholds(model: YOLO, image_path: str) -> tuple:
 # 3. visualize
 
 def visualize(results, img_pil: Image.Image, conf: float, save_path: Path) -> None:
-    """
-    Dessine les boîtes OBB (polygones orientés) sur l'image et sauvegarde
-    la figure au chemin save_path.
-
-    Chaque région est représentée par deux Polygon superposés :
-      • rempli  (alpha=0.15)
-      • contour (facecolor="none")
-
-    En cas d'absence de détection, affiche un message centré et sauvegarde.
-    """
     fig, ax = plt.subplots(1, 1, figsize=(14, 10))
     ax.imshow(np.array(img_pil))
     ax.set_axis_off()
@@ -225,21 +192,6 @@ def visualize(results, img_pil: Image.Image, conf: float, save_path: Path) -> No
 # 4. report_and_export
 
 def report_and_export(results, conf: float, save_path: Path) -> None:
-    """
-    Affiche un rapport console groupé par classe
-    (effectif, confiance moyenne, maximum) et exporte les détections en JSON.
-
-    Structure JSON :
-    {
-      "model":          "magistermilitum/YOLO_manuscripts",
-      "paper":          "arXiv:2506.20326",
-      "conf_threshold": 0.10,
-      "regions": [
-        { "class": "Text", "confidence": 0.823,
-          "polygon": [[x1,y1],[x2,y2],[x3,y3],[x4,y4]] }
-      ]
-    }
-    """
     # Collecte
     regions = []
     per_class = defaultdict(list)
